@@ -9,8 +9,6 @@ PAGES = {
 }
 
 
-
-
 st.write("# Code the vote")
 
 
