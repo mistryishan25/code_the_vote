@@ -1,59 +1,72 @@
 import streamlit as st
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration
-import cv2
+import random
 
-RTC_CONFIGURATION = RTCConfiguration(
-    {"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-)
+# Set the page configuration
+st.set_page_config(page_title="Login Page", layout="centered")
 
-class VideoTransformer(VideoTransformerBase):
-    frame_lock: st.session_state  # Use Streamlit session_state to store the frame
+# Function to create a login card
+def create_login_card(profile_name, profile_description):
+    st.markdown(f"### {profile_name}")
+    st.write(profile_description)
+    if st.button(f"Login as {profile_name}"):
+        st.session_state.logged_in = True
+        st.session_state.profile = profile_name
+        st.experimental_rerun()
 
-    def recv(self, frame):
-        img = frame.to_ndarray(format="bgr24")
+# Main login page
+def main_login_page():
+    st.title("Login Page")
 
-        if self.frame_lock.save_frame:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)  # Convert BGR to RGB
-            st.session_state['captured_image'] = img  # Save the frame to session_state
-            self.frame_lock.save_frame = False
-
-        return img
-
-def show_buttons():
-    st.title('Voter Roadmap')
     col1, col2 = st.columns(2)
+
     with col1:
-        if st.button('#DressTheVote'):
-            st.session_state.current_page = 'webcam1'
-        if st.button('#FoodForVote'):
-            st.session_state.current_page = 'webcam2'
+        create_login_card("Profile 1", "Description for Profile 1")
+
     with col2:
-        if st.button('#MeetUrSenator'):
-            st.session_state.current_page = 'webcam3'
-        if st.button('#GoVote'):
-            st.session_state.current_page = 'webcam4'
-    # Display the captured image if it exists
-    if 'captured_image' in st.session_state:
-        st.image(st.session_state['captured_image'], caption='Captured Image', width=300)
+        create_login_card("Profile 2", "Description for Profile 2")
 
-def show_webcam(key):
-    if st.button("Go Back"):
-        st.session_state.current_page = 'buttons'
-    
-    st.write("Click 'Capture' to take a photo.")
-    if st.button("Capture"):
-        st.session_state.save_frame = True
+# Function to generate random task data
+def generate_task_data(task_type, num_tasks):
+    tasks = []
+    for i in range(num_tasks):
+        task = {
+            "title": f"{task_type} Task {i+1}",
+            "description": f"Description for {task_type.lower()} task {i+1}",
+            "progress": random.randint(0, 100)
+        }
+        tasks.append(task)
+    return tasks
 
-    webrtc_streamer(key=key, video_processor_factory=VideoTransformer, rtc_configuration=RTC_CONFIGURATION)
+# Profile page
+def profile_page():
+    st.title(f"Profile - {st.session_state.profile}")
 
-if 'current_page' not in st.session_state:
-    st.session_state.current_page = 'buttons'
-    st.session_state.save_frame = False
+    # st.header("Stats")
+    accomplished_tasks = random.randint(0, 50)
+    st.markdown(f"### Accomplished Tasks: {accomplished_tasks}")
+    # st.progress(accomplished_tasks / 50)
 
-if st.session_state.current_page == 'buttons':
-    show_buttons()
-    if 'captured_image' in st.session_state:
-        st.image(st.session_state['captured_image'], caption='Captured Image', width=300)
-elif st.session_state.current_page.startswith('webcam'):
-    show_webcam(st.session_state.current_page)
+    st.header("Tasks")
 
+    # Generate task data for the gallery
+    tasks = generate_task_data("Task", 8)
+
+    # Create two columns for the gallery
+    col1, col2 = st.columns(2)
+
+    # Loop through the tasks and create tiles
+    for i, task in enumerate(tasks):
+        col = col1 if i % 2 == 0 else col2
+        with col:
+            with st.expander(task["title"]):
+                st.write(task["description"])
+                st.progress(task["progress"] / 100)
+
+# Main logic
+if 'logged_in' not in st.session_state:
+    st.session_state.logged_in = False
+
+if st.session_state.logged_in:
+    profile_page()
+else:
+    main_login_page()
