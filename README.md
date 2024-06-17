@@ -1,9 +1,5 @@
 # code_the_vote
 
-Sure, I'll adjust the README to reflect that the app is already deployed on Streamlit Cloud and provide instructions on how to use the app directly.
-
----
-
 # Voting Adventure App
 
 Transform your journey to the voting place with selfies and fun tasks. Make voting an adventure worth remembering!
@@ -56,5 +52,3 @@ We welcome contributions! Please read our [Contributing Guidelines](CONTRIBUTING
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-Replace `https://your-streamlit-app-url` with the actual URL of your deployed Streamlit app. If you have specific contributing guidelines or a license file, make sure to include those as well.
